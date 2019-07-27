@@ -1,2 +1,2 @@
 # Machine-Learning
-All machine learning stuff that I got involved in
+All machine learning stuff that I get involved in
