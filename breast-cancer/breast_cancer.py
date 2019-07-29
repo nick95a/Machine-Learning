@@ -11,7 +11,7 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree import DecisionTreeClassifier
-
+from sklearn.metrics import roc_auc_score, classification_report, accuracy_score
 
 
 # Step 2.
@@ -58,8 +58,6 @@ for i in range(0, len(column_names), 5):
 # Splitting the dataset into training and testing data. Test_size = 0.3 indicates that testing data should
 # constitute 30% of the entire dataset
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 24)
-
-
 # Scaling the data. We see even from the snippet below that ranges of values for different variables vary a lot
 # Standard scaler performs centering and scaling by the mean and variance of every feature in the dataset
 max_values = np.transpose(X.describe()[-1:][:])
@@ -68,31 +66,67 @@ min_values = np.transpose(X.describe().iloc[3, :])
 
 scaler = StandardScaler()
 X_train = pd.DataFrame(scaler.fit_transform(X_train))
-X_test = pd.DataFrame(scaler.transform(X_train))
-
+X_test = pd.DataFrame(scaler.transform(X_test))
+y_train = y_train.iloc[:, 0]
+y_test = y_test.iloc[:, 0]
 #Step 3. Algorithm/Method selection. Below, I will explore the standard classification methods that one can get
 # from sklearn.
 
+
 logRegClassifier = LogisticRegression()
-logRegClassifier.fit(X_train)
-logRegClassifier.predict(X_test)
+logRegClassifier.fit(X_train, y_train)
+predLog = logRegClassifier.predict(X_test)
+probaLog = logRegClassifier.predict_proba(X_test)
+probaLog = probaLog[:,1]
 
 neighClassifier = KNeighborsClassifier()
-neighClassifier.fit(X_train)
-neighClassifier.predict(X_test)
+neighClassifier.fit(X_train, y_train)
+predNeigh = neighClassifier.predict(X_test)
+probaNeigh = neighClassifier.predict_proba(X_test)
+probaNeigh = probaNeigh[:, 1]
 
-svmClassifier = SVC()
-svmClassifier.fit(X_train)
-svmClassifier.predict(X_test)
+svmClassifier = SVC(probability = True)
+svmClassifier.fit(X_train, y_train)
+predSVC = svmClassifier.predict(X_test)
+probaSVC = svmClassifier.predict_proba(X_test)
+probaSVC = probaSVC[:, 1]
+
 
 decTreeClassifier = DecisionTreeClassifier()
-decTreeClassifier.fit(X_train)
-decTreeClassifier.predict(X_test)
+decTreeClassifier.fit(X_train, y_train)
+predTree = decTreeClassifier.predict(X_test)
+probaTree = decTreeClassifier.predict_proba(X_test)
+probaTree = probaTree[:, 1]
 
 randomForest = RandomForestClassifier()
-randomForest.fit(X_train)
-randomForest.predict(X_test)
+randomForest.fit(X_train, y_train)
+predForest = randomForest.predict(X_test)
+probaForest = randomForest.predict_proba(X_test)
+probaForest = probaForest[:, 1]
 
 gaussNB = GaussianNB()
-gaussNB.fit(X_train)
-gaussNB.predict(X_test)
+gaussNB.fit(X_train, y_train)
+predGauss = gaussNB.predict(X_test)
+probaGauss = gaussNB.predict_proba(X_test)
+probaGauss = probaGauss[:, 1]
+
+
+names = ["Logistic", "Gaussian", "RanForest", "DecTree", "SVC", "KNN"]
+predictions = {"Logistic" : [probaLog, predLog], "Gaussian" : [probaGauss, predGauss], "RanForest" : [probaForest, predForest], "DecTree" : [probaTree, predTree],\
+         "SVC": [probaSVC, predSVC],"KNN" : [probaNeigh, predNeigh]}
+
+auc_results = {} # store ROC-AUC results
+accuracy_results = {}
+class_report_results = {}
+
+def metrics_calculator(y_test, predictions, names):
+    for name in names:
+        auc_score = roc_auc_score(y_test, predictions[name][0])
+        accuracy = accuracy_score(y_test, predictions[name][1])
+        class_report = classification_report(y_test, predictions[name][1])
+        auc_results[name] = auc_score
+        accuracy_results[name] = accuracy
+        class_report_results[name] = class_report
+
+metrics_calculator(y_test, predictions, names)
+
