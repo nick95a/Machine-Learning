@@ -71,40 +71,49 @@ y_train = y_train.iloc[:, 0]
 y_test = y_test.iloc[:, 0]
 #Step 3. Algorithm/Method selection. Below, I will explore the standard classification methods that one can get
 # from sklearn.
+# Note: At the moment, no grid search over hyperparameters is present. Planning to add this a bit later. In any case
+# check out sklearn, for example, GridSearchCV and read the docs.
 
-
-logRegClassifier = LogisticRegression()
+# Look at penalty and C parameters for regularization
+logRegClassifier = LogisticRegression(random_state = 24)
 logRegClassifier.fit(X_train, y_train)
 predLog = logRegClassifier.predict(X_test)
 probaLog = logRegClassifier.predict_proba(X_test)
 probaLog = probaLog[:,1]
 
-neighClassifier = KNeighborsClassifier()
+
+# Look to play around with the number of neighbors, metric and etc.
+neighClassifier = KNeighborsClassifier(random_state = 24)
 neighClassifier.fit(X_train, y_train)
 predNeigh = neighClassifier.predict(X_test)
 probaNeigh = neighClassifier.predict_proba(X_test)
 probaNeigh = probaNeigh[:, 1]
 
-svmClassifier = SVC(probability = True)
+
+# Look to optimize C and kernel choice for SVC
+svmClassifier = SVC(probability = True, random_state = 24)
 svmClassifier.fit(X_train, y_train)
 predSVC = svmClassifier.predict(X_test)
 probaSVC = svmClassifier.predict_proba(X_test)
 probaSVC = probaSVC[:, 1]
 
-
-decTreeClassifier = DecisionTreeClassifier()
+# Look to change criterion, max_depth, min_samples_leaf and etc.
+decTreeClassifier = DecisionTreeClassifier(random_state = 24)
 decTreeClassifier.fit(X_train, y_train)
 predTree = decTreeClassifier.predict(X_test)
 probaTree = decTreeClassifier.predict_proba(X_test)
 probaTree = probaTree[:, 1]
 
-randomForest = RandomForestClassifier()
+
+# Look to change n_estimators (trees), criterion, max_depth and others
+randomForest = RandomForestClassifier(random_state = 24)
 randomForest.fit(X_train, y_train)
 predForest = randomForest.predict(X_test)
 probaForest = randomForest.predict_proba(X_test)
 probaForest = probaForest[:, 1]
 
-gaussNB = GaussianNB()
+
+gaussNB = GaussianNB(random_state = 24)
 gaussNB.fit(X_train, y_train)
 predGauss = gaussNB.predict(X_test)
 probaGauss = gaussNB.predict_proba(X_test)
@@ -129,4 +138,6 @@ def metrics_calculator(y_test, predictions, names):
         class_report_results[name] = class_report
 
 metrics_calculator(y_test, predictions, names)
+# To access classification report for say logistic regression, one needs to do this:
+# class_report_results["Logistic"]. This contains precision, recall, f1-score and the size of the support cols
 
