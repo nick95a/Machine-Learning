@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn import datasets
 from sklearn.svm import SVC
+from sklearn.metrics import classification_report, roc_auc_score
+from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 
 dataset = datasets.load_digits()
@@ -17,8 +19,8 @@ new_dataset = np.array(dataset.images)
 new_dataset = np.reshape(new_dataset, newshape = (new_dataset.shape[0], -1))
 new_dataset.shape
 
-y_series = y.iloc[:,0]
-y_series.value_counts()
+y = y.iloc[:,0]
+y.value_counts()
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.33)
 
@@ -31,4 +33,10 @@ for index, (image, label) in enumerate(images[:4], 1):
     plt.imshow(image, cmap = "Greys")
     plt.title("Training image for number {}".format(label))
 
-plt.show()
+params = {'C': np.linspace(0.1,2,20), 'kernel' : ['rbf', 'linear', 'rbf','sigmoid']}
+classifier = SVC()
+classifier = GridSearchCV(classifier, param_grid = params,cv = 5)
+classifier.fit(X_train, y_train)
+predictions = classifier.predict(X_test)
+probas = classifier.predict_proba(X_test)
+roc_auc_score(y_test, probas)
