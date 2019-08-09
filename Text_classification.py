@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.datasets import fetch_20newsgroups
+from sklearn.naive_bayes import MultinomialNB
+
+
+# Step 1-2: Load the dataset, explore it and prepare it for the model
 
 # Load the dataset and the names of the categories
 news_bunch = fetch_20newsgroups(subset = 'train', shuffle = True, random_state = 24)
@@ -38,4 +42,19 @@ trans.idf_
 # Check out the shape of the transformed feature map
 X_train_new.shape
 
+# Step 3: Building the ML model. The choice is vast, but we will limit ourselves to the basic ones.
+NB = MultinomialNB()
+NB.fit(X_train_new, news_bunch.target)
 
+
+# Little check on the model
+phrases = ['Pastafarianism is a religion', 'Hockey is the best sport in the world']
+X_n = vect.transform(phrases)
+X_n_n = trans.transform(X_n)
+pred = NB.predict(X_n_n)
+
+for i,p in enumerate(pred):
+    print(phrases[i])
+    print(news_bunch.target_names[p])
+
+# We can create a pipeline from the standard sklearn tools to make the process easier
