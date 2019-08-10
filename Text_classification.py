@@ -6,6 +6,7 @@ import seaborn as sns
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
 
 
@@ -59,4 +60,5 @@ for i,p in enumerate(pred):
     print(news_bunch.target_names[p])
 
 # We can create a pipeline from the standard sklearn tools to make the process easier
-clf = Pipeline([('BOW', CountVectorizer), ('Tfidf', TfidfTransformer), ('NB', MultinomialNB)])
+nb_pipeline = Pipeline([('BOW', CountVectorizer), ('Tfidf', TfidfTransformer), ('NB', MultinomialNB)])
+svc_pipeline = Pipeline([('BOW', CountVectorizer),("Tfidf", TfidfTransformer), ("SVC", SVC)])
