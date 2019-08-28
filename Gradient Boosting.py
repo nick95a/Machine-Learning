@@ -22,11 +22,15 @@ feature_names = boston_dataset['feature_names']
 
 X_train, X_test, y_train, y_test = train_test_split(data_x, data_y, test_size = 0.3)
 
-params = {'loss': ('ls', 'lad', 'huber', 'quantile'), 'learning_rate': np.linspace(0, 1, 50),
+gb_params = {'loss': ('ls', 'lad', 'huber', 'quantile'), 'learning_rate': np.linspace(0, 1, 50),
           'max_depth': np.linspace(2, 6, 5)}
-regressor = GradientBoostingRegressor(random_state = 24)
-grid = GridSearchCV(regressor, params, cv = 5)
-regressor.fit(X_train, y_train)
+gb_reg = GradientBoostingRegressor(random_state = 24)
+grid = GridSearchCV(gb_reg, gb_params, cv = 5)
+gb_reg.fit(X_train, y_train)
+
+tree_params = {}
+tree_reg = DecisionTreeRegressor(tree_params)
+ada_reg = AdaBoostRegressor(tree_reg, random_state = 24)
 
 '''
 Добавить проверку isnull, duplicates
